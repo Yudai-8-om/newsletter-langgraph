@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     DATABASE_URL_NO_DOCKER: str
     @property
     def DATABASE_URL(self) -> str:
-        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@db/{self.POSTGRES_DB}"
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@postgres_db:5432/{self.POSTGRES_DB}"
 
 try:
     settings = Settings()
