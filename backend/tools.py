@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from langsmith import traceable
-from backend.settings import settings
+from settings import settings
 
 @traceable
 def fetch_news_api(country: str):

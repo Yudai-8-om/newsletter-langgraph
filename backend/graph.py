@@ -3,13 +3,13 @@ from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import HumanMessage, SystemMessage
-from backend.tools import fetch_news_api
-from backend.state import AgentState
-from backend.prompts import writer_system_prompt
-from backend.settings import settings
+from tools import fetch_news_api
+from state import AgentState
+from prompts import writer_system_prompt
+from settings import settings
 from langgraph.prebuilt import create_react_agent
-from backend.db import get_pg_async_session
-from backend.models import Newsletter
+from db import get_pg_async_session
+from models import Newsletter
 from stripe_agent_toolkit.langchain.toolkit import StripeAgentToolkit
 
 
