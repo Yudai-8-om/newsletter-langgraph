@@ -51,14 +51,6 @@ async def create_newsletter(newsletter_data: NewNewsletter, session: AsyncSessio
     return new_newsletter
 
 
-# @app.get("/articles")
-# async def get_articles(session: AsyncSession = Depends(get_pg_async_session)):
-#     """
-#     Fetches articles from the database.
-#     """
-#     session.add
-#     return await models.get_latetst_articles()
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
