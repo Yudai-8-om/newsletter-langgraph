@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: aa86f532a478
+Revision ID: b9551e27e908
 Revises: 
-Create Date: 2025-08-02 22:47:47.310373
+Create Date: 2025-08-04 02:17:19.244121
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'aa86f532a478'
+revision: str = 'b9551e27e908'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,10 +30,15 @@ def upgrade() -> None:
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('username', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
+    sa.Column('hashed_password', sa.String(), nullable=False),
     sa.Column('is_subscribed', sa.Boolean(), nullable=False),
+    sa.Column('stripe_customer_id', sa.String(), nullable=True),
+    sa.Column('stripe_subscription_id', sa.String(), nullable=True),
+    sa.Column('subscription_status', sa.String(), nullable=True),
+    sa.Column('subscription_end', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
     sa.UniqueConstraint('email', name=op.f('uq_users_email'))
     )

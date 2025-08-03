@@ -1,11 +1,16 @@
 import asyncio
 import asyncpg
+from typing import Annotated
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from db import fastapi_async_session_dependency
-from models import Newsletter, NewsletterResponse, NewNewsletter
+from models.newsletter import Newsletter, NewsletterResponse, NewNewsletter
+from models.user import User, UserEntry, UserResponse
 from typing import List
+from auth import hash_password, create_access_token, verify_password, Token
+
+
 app = FastAPI()
 
 @app.get("/")
@@ -15,6 +20,40 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+@app.post("/register", response_model=Token)
+async def register_user(new_user: UserEntry, session: AsyncSession = Depends(fastapi_async_session_dependency)):
+    """Register a new user"""
+    existing_user = await session.execute(select(User).where(User.email == new_user.email))
+    if existing_user.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered. Log in instead."
+        )
+    
+    hashed_password = hash_password(new_user.password)
+    user = User(email=new_user.email, hashed_password=hashed_password)
+    
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    token = create_access_token(data={"sub": user.id})
+    return {"access_token": token}
+
+@app.post("/login", response_model=Token)
+async def login_user(user: UserEntry, session: AsyncSession = Depends(fastapi_async_session_dependency)):
+    """Log in an existing user"""
+    result = await session.execute(select(User).where(User.email == user.email))
+    expected_user = result.scalar_one_or_none()
+    if not expected_user or not verify_password(user.password, expected_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+    token = create_access_token(data={"sub": expected_user.id})
+    return {"access_token": token}
+
+
 
 @app.get("/newsletters", response_model=List[NewsletterResponse])
 async def get_newsletters(session: AsyncSession = Depends(fastapi_async_session_dependency)):

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     DATABASE_URL_NO_DOCKER: str
+    JWT_SECRET_KEY: str
     @property
     def DATABASE_URL(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@postgres_db:5432/{self.POSTGRES_DB}"
