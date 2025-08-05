@@ -15,7 +15,7 @@ def fetch_news_api(country: str):
             country = "br"
         case "Japan":
             country = "jp"
-    url =  f"https://api.webz.io/newsApiLite?token={settings.NEWS_API_KEY}&q=published%3A%3Enow-24h%20site_category%3Atop_news_{country}%20performance_score%3A%3E0%20country%3A{country}"
+    url =  f"https://api.webz.io/newsApiLite?token={settings.NEWS_API_KEY}&q=published%3A%3Enow-24h%20site_category%3Atop_news_{country}%20performance_score%3A%3E0%20country%3A{country}%20language%3Aenglish"
     
     response = requests.get(url, timeout=10)
     if response.status_code == 200:

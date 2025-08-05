@@ -36,7 +36,7 @@ def generate_newsletter(state: AgentState) -> AgentState:
         api_key=settings.OPENROUTER_API_KEY,
         base_url="https://openrouter.ai/api/v1",
     )
-    news_str = "\n".join(f"<trending_news> Title: {news['title']} \nContent: {news['content']}</trending_news>" for news in state.trending_news[:2])
+    news_str = "\n".join(f"<trending_news> Title: {news['title']} \nContent: {news['content']}</trending_news>" for news in state.trending_news[:3])
     print(f"passed news: {news_str}")
     user_message = [SystemMessage(content=writer_system_prompt.format(news=news_str)), HumanMessage(content="Using the given trending news, write a newsletter")]
     result = chat_openai.invoke(user_message)
@@ -125,3 +125,9 @@ builder.add_edge("list_trending_news", "generate_newsletter")
 builder.add_edge("generate_newsletter", "save_newsletter")
 builder.add_edge("save_newsletter", END)
 graph = builder.compile()
+
+def build_curation_agent():
+    """
+    Build the Langgraph agent for newsletter generation
+    """
+    return graph
