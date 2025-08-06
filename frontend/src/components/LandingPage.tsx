@@ -9,7 +9,6 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 w-screen">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center max-w-screen-xl">
@@ -43,7 +42,6 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -70,10 +68,8 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Newsletter Sample */}
         <NewsletterArticle />
 
-        {/* CTA Section */}
         <div className="text-center bg-blue-600 rounded-lg p-12 text-white">
           <h3 className="text-3xl font-bold mb-4">Ready to Stay Informed?</h3>
           <p className="text-xl mb-8 opacity-90">
@@ -94,7 +90,6 @@ const LandingPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
@@ -103,7 +98,6 @@ const LandingPage = () => {
         </div>
       </footer>
 
-      {/* Auth Card */}
       {showLogin && (
         <AuthCard isLogin={true} onClose={() => setShowLogin(false)} />
       )}

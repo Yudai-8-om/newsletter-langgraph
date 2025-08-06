@@ -1,5 +1,5 @@
-from datetime import timedelta, datetime
-from passlib.context import CryptContext
+from datetime import timedelta, datetime, timezone
+import bcrypt
 import jwt
 from jwt.exceptions import InvalidTokenError
 from fastapi import HTTPException, status, Depends
@@ -16,21 +16,28 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+def hash_password(password: str)-> str: 
+    b_hashed_pass = bcrypt.hashpw(
+        bytes(password, encoding="utf-8"),
+        bcrypt.gensalt(),
+    )
+    return b_hashed_pass.decode('utf-8')
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
 
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(
+        bytes(plain_password, encoding="utf-8"),
+        bytes(hashed_password, encoding="utf-8"),
+    )
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=30)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=30)
     to_encode.update({"exp": expire})
 
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm="HS256")
@@ -38,7 +45,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def decode_access_token(token: str):
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms="HS256")
         return payload
     except jwt.ExpiredSignatureError :
         raise HTTPException(
@@ -62,7 +69,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
     except InvalidTokenError:
         raise credentials_exception
     user_id = int(payload.get("sub"))
-    result = await session.executez(select(User).where(User.id == user_id))
+    result = await session.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if user is None:
         raise credentials_exception

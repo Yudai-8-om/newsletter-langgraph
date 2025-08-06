@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router";
 import "./App.css";
 import LandingPage from "./components/LandingPage";
+import Dashboard from "./components/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -8,17 +10,14 @@ function App() {
       <div className="min-h-screen">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          {/* <Route
-            path="/search"
+          <Route
+            path="/dashboard"
             element={
-              <MetricsPage
-                ticker={ticker}
-                metrics={metrics}
-                loading={loading}
-                error={error}
-              />
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
             }
-          /> */}
+          />
         </Routes>
       </div>
     </>

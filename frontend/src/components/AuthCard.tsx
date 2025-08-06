@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import { postLoginRequest, postRegisterRequest } from "../api/NewsletterAPI";
 
 interface AuthCardProps {
   isLogin: boolean;
@@ -7,6 +10,8 @@ interface AuthCardProps {
 }
 
 const AuthCard = ({ isLogin, onClose }: AuthCardProps) => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [showLogin, setShowLogin] = useState(isLogin);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,6 +22,53 @@ const AuthCard = ({ isLogin, onClose }: AuthCardProps) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleLogin = async () => {
+    try {
+      const token = await postLoginRequest({
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log(token);
+      login(token.access_token);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to login:", error);
+      alert("Either email or password is not correct.");
+    }
+  };
+
+  const handleRegister = async () => {
+    if (!formData.email.includes("@")) {
+      alert("Invalid email format");
+      return;
+    }
+    if (formData.password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      alert("Password doesn't match");
+      return;
+    }
+    try {
+      const token = await postRegisterRequest({
+        email: formData.email,
+        password: formData.password,
+      });
+      login(token.access_token);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to register:", error);
+      alert("Registration failed. Please try again.");
+    }
+
+    const token = await postRegisterRequest({
+      email: formData.email,
+      password: formData.password,
+    });
+    sessionStorage.setItem("session_token", token.access_token);
+    navigate("/dashboard");
   };
 
   return (
@@ -100,7 +152,7 @@ const AuthCard = ({ isLogin, onClose }: AuthCardProps) => {
           )}
 
           <button
-            // onClick={showLogin ? handleLogin : handleRegister}
+            onClick={showLogin ? handleLogin : handleRegister}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
           >
             {showLogin ? "Sign In" : "Create Account"}

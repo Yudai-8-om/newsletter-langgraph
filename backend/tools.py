@@ -58,3 +58,4 @@ def get_text_content(url: str) -> str:
         return out_text
     else:
         return ""
+

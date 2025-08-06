@@ -25,6 +25,7 @@ def generate_newsletter(state: AgentState) -> AgentState:
     """
     Langgraph node that generates newsletter
     """
+    # If you use local Ollama, uncomment this
     # chat_ollama = ChatOllama(
     #     base_url=settings.OLLAMA_BASE_URL, 
     #     model=settings.LLM_MODEL_LIGHT, 
