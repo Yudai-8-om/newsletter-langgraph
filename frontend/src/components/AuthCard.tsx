@@ -29,7 +29,6 @@ const AuthCard = ({ isLogin, onClose }: AuthCardProps) => {
         email: formData.email,
         password: formData.password,
       });
-      console.log(token);
       login(token.access_token);
       navigate("/dashboard");
     } catch (error) {

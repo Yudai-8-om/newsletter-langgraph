@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-// dotenv.config({ path: "../../../.env" });
-// const baseURL = process.env.BASE_URL;
 const baseURL = "http://localhost:8000";
 
 export interface Newsletter {
@@ -16,9 +12,18 @@ export interface UserRequest {
   password: string;
 }
 
+export interface UserSubscriptionStatus {
+  email: string;
+  is_subscribed: boolean;
+}
+
 export interface Token {
   access_token: string;
   token_type: string;
+}
+
+export interface StripeUrl {
+  checkout_url: string;
 }
 
 async function get<T>(url: string, token: string | null): Promise<T> {
@@ -39,7 +44,41 @@ async function get<T>(url: string, token: string | null): Promise<T> {
   return response.json();
 }
 
-async function post<T>(url: string, data: any, token?: string): Promise<T> {
+export async function getNewsletters(): Promise<Newsletter[]> {
+  const url = `${baseURL}/newsletters`;
+  const token = sessionStorage.getItem("session_token");
+  try {
+    const newsletters = await get<Newsletter[]>(url, token);
+    return newsletters;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch newsletters: ${error.message}`);
+    } else {
+      throw new Error("An unknown error occurred while fetching newsletters");
+    }
+  }
+}
+
+export async function getMyInfo(): Promise<UserSubscriptionStatus> {
+  const url = `${baseURL}/me`;
+  const token = sessionStorage.getItem("session_token");
+  try {
+    const status = await get<UserSubscriptionStatus>(url, token);
+    return status;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch user info: ${error.message}`);
+    } else {
+      throw new Error("An unknown error occurred while fetching user info");
+    }
+  }
+}
+
+async function post<T>(
+  url: string,
+  data: any,
+  token?: string | null
+): Promise<T> {
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
   if (token) {
@@ -55,21 +94,6 @@ async function post<T>(url: string, data: any, token?: string): Promise<T> {
     throw new Error(`Status: ${response.status}, Message: ${errorText}`);
   }
   return response.json();
-}
-
-export async function getNewsletters(): Promise<Newsletter[]> {
-  const url = `${baseURL}/newsletters`;
-  const token = sessionStorage.getItem("session_token");
-  try {
-    const newsletters = await get<Newsletter[]>(url, token);
-    return newsletters;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to fetch newsletters: ${error.message}`);
-    } else {
-      throw new Error("An unknown error occurred while fetching newsletters");
-    }
-  }
 }
 
 export async function postLoginRequest(user: UserRequest): Promise<Token> {
@@ -96,6 +120,25 @@ export async function postRegisterRequest(user: UserRequest): Promise<Token> {
       throw new Error(`Failed to register: ${error.message}`);
     } else {
       throw new Error("An unknown error occurred while requesting register");
+    }
+  }
+}
+
+export async function postUpgradeRequest() {
+  const url = `${baseURL}/subscription`;
+  const token = sessionStorage.getItem("session_token");
+  try {
+    const stripeUrl = await post<StripeUrl>(
+      url,
+      { subscription: "activate" },
+      token
+    );
+    return stripeUrl;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed: ${error.message}`);
+    } else {
+      throw new Error("An unknown error occurred while requesting upgrade");
     }
   }
 }

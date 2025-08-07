@@ -7,16 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from db import fastapi_async_session_dependency
 from models.newsletter import Newsletter, NewsletterResponse, NewNewsletter
-from models.user import User, UserEntry, UserResponse
+from models.user import User, UserEntry, UserResponse, UserSubscriptionEntry
 from typing import List
 from auth import hash_password, create_access_token, verify_password, get_current_user, Token
+from tools import create_stripe_customer, create_stripe_subscription_session
 
 
 app = FastAPI()
 
 origins = [
     "http://localhost",
-    "http://localhost:5173" # dev usage
+    "http://localhost:5173", # dev usage
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -43,13 +44,13 @@ async def register_user(new_user: UserEntry, session: AsyncSession = Depends(fas
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered. Log in instead."
         )
-    
+    stripe_customer = create_stripe_customer(new_user.email)
     hashed_password = hash_password(new_user.password)
-    user = User(email=new_user.email, hashed_password=hashed_password)
+    user = User(email=new_user.email, hashed_password=hashed_password, stripe_customer_id=stripe_customer.id)
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    token = create_access_token(data={"sub": user.id})
+    token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": token}
 
 @app.post("/login", response_model=Token)
@@ -64,6 +65,11 @@ async def login_user(user: UserEntry, session: AsyncSession = Depends(fastapi_as
         )
     token = create_access_token(data={"sub": str(expected_user.id)})
     return {"access_token": token}
+
+@app.get("/me", response_model=UserResponse)
+async def get_newsletters(user: User = Depends(get_current_user)):
+    """Get last 7 days newsletters"""
+    return user
 
 @app.delete("/user")
 async def delete_user(user: UserEntry, session: AsyncSession = Depends(fastapi_async_session_dependency)):
@@ -118,6 +124,13 @@ async def create_newsletter(newsletter_data: NewNewsletter, session: AsyncSessio
     
     return new_newsletter
 
+@app.post("/subscription")
+async def activate_subscription(entry: UserSubscriptionEntry, user: User = Depends(get_current_user)):
+    try: 
+        session = create_stripe_subscription_session(user.stripe_customer_id)
+        return {"checkout_url": session.url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from langsmith import traceable
 from settings import settings
+import stripe
 
 @traceable
 def fetch_news_api(country: str):
@@ -59,3 +60,29 @@ def get_text_content(url: str) -> str:
     else:
         return ""
 
+def create_stripe_customer(user_email: str):
+    """
+    Creates new Stripe customer object.
+    """
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    new_customer = stripe.Customer.create(
+        email=user_email
+    )
+    return new_customer
+
+# doc https://docs.stripe.com/api/checkout/sessions/create
+def create_stripe_subscription_session(customer_id: str):
+    """
+    Creates new Stripe checkout session.
+    """
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    session = stripe.checkout.Session.create(
+        customer=customer_id,
+        mode='subscription',
+        line_items=[{
+            'price': settings.STRIPE_SUBSCRIPTION_PRICE_KEY,
+            'quantity': 1
+        }],
+        success_url="https://www.google.com/",        
+        )
+    return session

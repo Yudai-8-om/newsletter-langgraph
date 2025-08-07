@@ -3,6 +3,8 @@ import "./App.css";
 import LandingPage from "./components/LandingPage";
 import Dashboard from "./components/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import SubscriptionSuccess from "./components/SubscriptionSuccess";
+import SubscriptionFailure from "./components/SubscriptionFailure";
 
 function App() {
   return (
@@ -17,6 +19,14 @@ function App() {
                 <Dashboard />
               </PrivateRoute>
             }
+          />
+          <Route
+            path="/subscription/success"
+            element={<SubscriptionSuccess />}
+          />
+          <Route
+            path="/subscription/failure"
+            element={<SubscriptionFailure />}
           />
         </Routes>
       </div>

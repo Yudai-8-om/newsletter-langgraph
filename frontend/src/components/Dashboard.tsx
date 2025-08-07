@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router";
 import type { Newsletter } from "../api/NewsletterAPI";
-import { getNewsletters } from "../api/NewsletterAPI";
+import {
+  getNewsletters,
+  getMyInfo,
+  postUpgradeRequest,
+} from "../api/NewsletterAPI";
 import { useAuth } from "../hooks/useAuth";
 
 const Dashboard = () => {
@@ -10,24 +13,44 @@ const Dashboard = () => {
   const { logout } = useAuth();
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
 
   useEffect(() => {
+    const checkSubscription = async () => {
+      try {
+        const status = await getMyInfo();
+        setIsSubscribed(status.is_subscribed);
+      } catch (error) {
+        console.error("Failed to fetch status:", error);
+        setIsSubscribed(false);
+      }
+    };
+    const fetchNewsletters = async () => {
+      try {
+        const newsletters = await getNewsletters();
+        setNewsletters(newsletters);
+      } catch (error) {
+        console.error("Failed to fetch newsletters:", error);
+      }
+    };
+    checkSubscription();
     fetchNewsletters();
   }, []);
+
+  const handleUpgradeRequest = async () => {
+    try {
+      const stripeUrl = await postUpgradeRequest();
+      window.open(stripeUrl.checkout_url, "_blank");
+    } catch (error) {
+      console.error("Failed to create upgrade session:", error);
+      alert("Failed to create upgrade session. Please contact support team.");
+    }
+  };
 
   const handleLogout = async () => {
     logout();
     navigate("/");
     alert("You successfully logged out.");
-  };
-
-  const fetchNewsletters = async () => {
-    try {
-      const newsletters = await getNewsletters();
-      setNewsletters(newsletters);
-    } catch (error) {
-      console.error("Failed to fetch newsletters:", error);
-    }
   };
 
   return (
@@ -41,13 +64,17 @@ const Dashboard = () => {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Link
-                to="/billing"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Billing
-              </Link>
-              <span className="text-sm text-gray-600">Free version</span>
+              {!isSubscribed && (
+                <button
+                  onClick={handleUpgradeRequest}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+                >
+                  Upgrade to Premium
+                </button>
+              )}
+              <span className="text-sm text-gray-600">
+                {isSubscribed ? "Premium" : "Free Version"}
+              </span>
               <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"

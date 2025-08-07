@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     LLM_MODEL: str = "qwen3:8b-q4_K_M"
     OPENROUTER_API_KEY: str
     OPENROUTER_MODEL: str = "qwen/qwen3-235b-a22b:free"
+    STRIPE_SECRET_KEY: str
+    STRIPE_SUBSCRIPTION_PRICE_KEY: str
+    STRIPE_WEBHOOK_SECRET: str
     NEWS_API_KEY: str
     POSTGRES_DB: str
     POSTGRES_USER: str

@@ -30,15 +30,18 @@ class UserEntry(BaseModel):
     email: EmailStr
     password: str
 
+class UserSubscriptionEntry(BaseModel):
+    """
+    Schema for subscription management.
+    """
+    subscription: str
+
 class UserResponse(BaseModel):
     """
     Schema for user response.
     """
-    id: int
     email: EmailStr
     is_subscribed: bool
-    created_at: datetime
-    updated_at: datetime
     
     model_config = ConfigDict(
         from_attributes=True)
