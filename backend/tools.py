@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 from langsmith import traceable
 from settings import settings
 import stripe
+from smtplib import SMTP_SSL
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 @traceable
 def fetch_news_api(country: str):
@@ -86,3 +89,16 @@ def create_stripe_subscription_session(customer_id: str):
         success_url="https://www.google.com/",        
         )
     return session
+
+def send_email(email: str, subject: str, html_content: str):
+    message = MIMEMultipart("alternative")
+    message["From"] = settings.EMAIL_ADDRESS
+    message["To"] = email
+    message["Subject"] = subject
+    html_part = MIMEText(html_content, "html")
+    message.attach(html_part)
+
+    with SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.ehlo()
+        server.login(settings.EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
+        server.send_message(message)

@@ -9,12 +9,14 @@ from typing import Deque, List, Optional, Tuple, Dict
 
 class AgentState(BaseModel):
     """Internal state shared between agents in the graph."""
-    interests: Optional[List[str]] = None
+    user_interests: Optional[List[str]] = None
     country: str = "US"
     agent_type: str = "curation"
     trending_news: Optional[List[Dict[str, str]]] = None
-    sources_used: Optional[List[str]] = None
-    is_subscribed: Optional[bool] = None
     payment_status: Optional[str] = None
     newsletter_title: Optional[str] = None
     newsletter_content: Optional[str] = None
+    email_non_sub_subject: Optional[str] = None
+    email_non_sub_body: Optional[str] = None
+    email_sub_subject: Optional[str] = None
+    email_sub_body: Optional[str] = None
