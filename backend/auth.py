@@ -4,13 +4,13 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
-from settings import settings
+from backend.settings import settings
 from pydantic import BaseModel
 from typing import Annotated
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.user import User
-from db import fastapi_async_session_dependency
+from backend.models.user import User
+from backend.db import fastapi_async_session_dependency
 
 class Token(BaseModel):
     access_token: str

@@ -5,12 +5,12 @@ from fastapi import FastAPI, Depends, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
-from db import fastapi_async_session_dependency
-from models.newsletter import Newsletter, NewsletterResponse, NewNewsletter
-from models.user import User, UserEntry, UserResponse, UserSubscriptionEntry
+from backend.db import fastapi_async_session_dependency
+from backend.models.newsletter import Newsletter, NewsletterResponse, NewNewsletter
+from backend.models.user import User, UserEntry, UserResponse, UserSubscriptionEntry
 from typing import List
-from auth import hash_password, create_access_token, verify_password, get_current_user, Token
-from tools import create_stripe_customer, create_stripe_subscription_session
+from backend.auth import hash_password, create_access_token, verify_password, get_current_user, Token
+from backend.tools import create_stripe_customer, create_stripe_subscription_session
 
 
 app = FastAPI()

@@ -1,4 +1,4 @@
-from graph import build_curation_agent
+from backend.graph import build_curation_agent
 import asyncio
 
 async def run_newsletter_agent():

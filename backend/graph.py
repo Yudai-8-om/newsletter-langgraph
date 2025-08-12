@@ -4,13 +4,13 @@ from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import HumanMessage, SystemMessage
-from tools import fetch_news_api, send_email
-from state import AgentState
-from prompts import writer_system_prompt, marketer_non_sub_system_prompt, marketer_sub_system_prompt
-from settings import settings
+from backend.tools import fetch_news_api, send_email
+from backend.state import AgentState
+from backend.prompts import writer_system_prompt, marketer_non_sub_system_prompt, marketer_sub_system_prompt
+from backend.settings import settings
 from langgraph.prebuilt import create_react_agent
-from db import get_pg_async_session
-from models import Newsletter, User
+from backend.db import get_pg_async_session
+from backend.models import Newsletter, User
 from sqlalchemy import select
 from stripe_agent_toolkit.langchain.toolkit import StripeAgentToolkit
 

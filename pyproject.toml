@@ -31,12 +31,17 @@ dependencies = [
 ]
 
 [tool.poetry]
+package-mode = false
 
 [tool.poetry.group.dev.dependencies]
 pytest-mock = "^3.14.1"
 notebook = "^7.4.4"
 langgraph-cli = { extras = ["inmem"], version = "^0.3.6" }
 langgraph-api = "^0.2.110"
+pytest = "^8.4.1"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -1,11 +1,14 @@
 import asyncio
 import asyncpg
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from settings import settings
+from backend.settings import settings
 from contextlib import asynccontextmanager
 
-
-engine = create_async_engine(settings.DATABASE_URL_NO_DOCKER, echo=True, pool_size=5, max_overflow=10)
+if settings.DEPLOY_LOCATION == "remote":
+    engine = create_async_engine(settings.DATABASE_URL_SUPABASE, echo=True, pool_size=5, max_overflow=10)
+else:
+    engine = create_async_engine(settings.DATABASE_URL_NO_DOCKER, echo=True, pool_size=5, max_overflow=10)
+    
 AsyncSessionFactory = async_sessionmaker(engine, expire_on_commit=False) 
 
 # Function to get a PostgreSQL database session

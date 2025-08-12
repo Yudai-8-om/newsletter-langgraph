@@ -26,8 +26,10 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_NO_DOCKER)
-# config.set_main_option("sqlalchemy.url", "postgresql+asyncpg://testuser:stock@localhost/cloudwalk_newsletter_db")
+if settings.DEPLOY_LOCATION == "remote":
+    config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SUPABASE)
+else:
+    config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_NO_DOCKER)
 
 
 def run_migrations_offline() -> None:

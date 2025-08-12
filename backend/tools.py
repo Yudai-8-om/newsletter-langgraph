@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from langsmith import traceable
-from settings import settings
+from backend.settings import settings
 import stripe
 from smtplib import SMTP_SSL
 from email.mime.multipart import MIMEMultipart

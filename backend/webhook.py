@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Request, Depends, HTTPException
-from settings import settings
-from models.user import User
+from backend.settings import settings
+from backend.models.user import User
 import stripe
 from sqlalchemy import select
-from db import get_pg_async_session
+from backend.db import get_pg_async_session
 
 webhook = FastAPI()
 
