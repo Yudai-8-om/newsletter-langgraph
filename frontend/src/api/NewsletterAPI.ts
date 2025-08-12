@@ -1,4 +1,4 @@
-const baseURL = "http://localhost:8000";
+const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
 export interface Newsletter {
   id: number;
@@ -45,7 +45,7 @@ async function get<T>(url: string, token: string | null): Promise<T> {
 }
 
 export async function getNewsletters(): Promise<Newsletter[]> {
-  const url = `${baseURL}/newsletters`;
+  const url = `${baseUrl}/newsletters`;
   const token = sessionStorage.getItem("session_token");
   try {
     const newsletters = await get<Newsletter[]>(url, token);
@@ -60,7 +60,7 @@ export async function getNewsletters(): Promise<Newsletter[]> {
 }
 
 export async function getMyInfo(): Promise<UserSubscriptionStatus> {
-  const url = `${baseURL}/me`;
+  const url = `${baseUrl}/me`;
   const token = sessionStorage.getItem("session_token");
   try {
     const status = await get<UserSubscriptionStatus>(url, token);
@@ -97,7 +97,7 @@ async function post<T>(
 }
 
 export async function postLoginRequest(user: UserRequest): Promise<Token> {
-  const url = `${baseURL}/login`;
+  const url = `${baseUrl}/login`;
   try {
     const sessionToken = await post<Token>(url, user);
     return sessionToken;
@@ -111,7 +111,7 @@ export async function postLoginRequest(user: UserRequest): Promise<Token> {
 }
 
 export async function postRegisterRequest(user: UserRequest): Promise<Token> {
-  const url = `${baseURL}/register`;
+  const url = `${baseUrl}/register`;
   try {
     const sessionToken = await post<Token>(url, user);
     return sessionToken;
@@ -125,7 +125,7 @@ export async function postRegisterRequest(user: UserRequest): Promise<Token> {
 }
 
 export async function postUpgradeRequest() {
-  const url = `${baseURL}/subscription`;
+  const url = `${baseUrl}/subscription`;
   const token = sessionStorage.getItem("session_token");
   try {
     const stripeUrl = await post<StripeUrl>(

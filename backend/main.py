@@ -1,22 +1,23 @@
 import asyncio
 import asyncpg
-from typing import Annotated
-from fastapi import FastAPI, Depends, status, HTTPException
+from typing import Annotated, List
+from fastapi import FastAPI, Depends, status, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
+import stripe
 from backend.db import fastapi_async_session_dependency
 from backend.models.newsletter import Newsletter, NewsletterResponse, NewNewsletter
 from backend.models.user import User, UserEntry, UserResponse, UserSubscriptionEntry
-from typing import List
+from backend.settings import settings
 from backend.auth import hash_password, create_access_token, verify_password, get_current_user, Token
-from backend.tools import create_stripe_customer, create_stripe_subscription_session
+from backend.tools import create_stripe_customer, create_stripe_subscription_session, update_user_subscription
+
 
 
 app = FastAPI()
 
 origins = [
-    "http://localhost",
     "https://newsletter-langgraph.vercel.app",
     "http://localhost:5173", # dev usage
 ]
@@ -132,6 +133,31 @@ async def activate_subscription(entry: UserSubscriptionEntry, user: User = Depen
         return {"checkout_url": session.url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/stripe-webhook")
+async def stripe_webhook(request: Request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_WEBHOOK_SECRET)
+    except ValueError as e:
+        print("Invalid payload")
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError as e:
+        print("Invalid signature")
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    print("Received verified event:", event["type"])
+    if event["type"] == "checkout.session.completed":
+        stripe_session = event["data"]["object"] #https://docs.stripe.com/api/checkout/sessions/object
+        subscription_id = stripe_session.get('subscription')
+        customer_id = stripe_session.get('customer')
+        subscription = stripe.Subscription.retrieve(subscription_id)
+        
+        await update_user_subscription(customer_id, subscription_id,  subscription["status"])
+
+    return {"status": "success"}
 
 
 if __name__ == "__main__":

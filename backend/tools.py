@@ -2,10 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 from langsmith import traceable
 from backend.settings import settings
+from backend.db import get_pg_async_session
+from backend.models.user import User
 import stripe
 from smtplib import SMTP_SSL
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from sqlalchemy import select
+
 
 @traceable
 def fetch_news_api(country: str):
@@ -86,7 +90,8 @@ def create_stripe_subscription_session(customer_id: str):
             'price': settings.STRIPE_SUBSCRIPTION_PRICE_KEY,
             'quantity': 1
         }],
-        success_url="https://www.google.com/",        
+        success_url="https://newsletter-langgraph.vercel.app/subscription/success",
+        cancel_url="https://newsletter-langgraph.vercel.app/subscription/failure",
         )
     return session
 
@@ -102,3 +107,17 @@ def send_email(email: str, subject: str, html_content: str):
         server.ehlo()
         server.login(settings.EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
         server.send_message(message)
+
+async def update_user_subscription(stripe_customer_id: str, subscription_id: str, subscription_status: str):
+    """
+    updates user subscritpion status upon webhook
+    """
+    async with get_pg_async_session() as session:
+        stmt = select(User).where(User.stripe_customer_id == stripe_customer_id)
+        result = await session.execute(stmt)
+        target_user = result.scalars().one()
+        target_user.stripe_subscription_id = subscription_id
+        target_user.subscription_status = subscription_status
+        target_user.is_subscribed = subscription_status == "active"
+
+        await session.commit()
