@@ -25,7 +25,7 @@ class User(Base):
     
 class UserEntry(BaseModel):
     """
-    Schema for creating a new user.
+    Schema for creating / deleting a user.
     """
     email: EmailStr
     password: str

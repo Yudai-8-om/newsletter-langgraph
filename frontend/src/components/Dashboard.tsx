@@ -53,6 +53,10 @@ const Dashboard = () => {
     alert("You successfully logged out.");
   };
 
+  const handleAccountInfoRequest = () => {
+    navigate("/account");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b">
@@ -72,14 +76,36 @@ const Dashboard = () => {
                   Upgrade to Premium
                 </button>
               )}
-              <span className="text-sm text-gray-600">
-                {isSubscribed ? "Premium" : "Free Version"}
-              </span>
+
               <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Logout
+              </button>
+              <button
+                onClick={handleAccountInfoRequest}
+                className={
+                  isSubscribed
+                    ? "p-2 text-green-500 hover:text-green-800 hover:bg-gray-100 rounded-full transition-colors"
+                    : "p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+                }
+                aria-label="Account"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
               </button>
             </div>
           </div>

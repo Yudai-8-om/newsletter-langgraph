@@ -83,6 +83,25 @@ async def delete_user(user: UserEntry, session: AsyncSession = Depends(fastapi_a
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid request"
         )
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    if expected_user.stripe_subscription_id:
+        try:
+            stripe.Subscription.cancel(expected_user.stripe_subscription_id)
+        except stripe.error.InvalidRequestError as e:
+            if "No such subscription" in str(e):
+                pass
+            else:
+                raise
+    if expected_user.stripe_customer_id:
+        try:
+            stripe.Customer.delete(expected_user.stripe_customer_id)
+        except stripe.error.InvalidRequestError as e:
+            if "No such customer" in str(e):
+                pass
+            else:
+                raise
+
     await session.execute(delete(User).where(User.email == user.email))
     await session.commit()
     return {"detail": "User deleted successfully"}
