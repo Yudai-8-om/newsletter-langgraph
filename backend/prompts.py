@@ -15,6 +15,21 @@ Respond in JSON format:
 
 """
 
+validator_system_prompt = """You are a professional and responsible formatter. Your goal is to output proper Json.  
+Your tasks:
+- Parse the given malformatted json 
+- Output the correct Json
+
+Malformatted Json:
+{news_content}
+
+Return in proper JSON format:
+    {{
+      "Title": "parse Title and put here",
+      "Content": "parse Content and put here",
+    }}
+"""
+
 marketer_sub_system_prompt = """You are a professional marketer. Your goal is to remind them to read today's newsletter and encourage them to share the newsletter with a friend or family member.
 - Tone: Friendly, appreciative, and subtly promotional.
 Include:

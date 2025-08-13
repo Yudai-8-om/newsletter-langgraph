@@ -70,7 +70,7 @@ async def login_user(user: UserEntry, session: AsyncSession = Depends(fastapi_as
 
 @app.get("/me", response_model=UserResponse)
 async def get_newsletters(user: User = Depends(get_current_user)):
-    """Get last 7 days newsletters"""
+    """Get user info"""
     return user
 
 @app.delete("/user")

@@ -6,7 +6,7 @@ from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import HumanMessage, SystemMessage
 from backend.tools import fetch_news_api, send_email
 from backend.state import AgentState
-from backend.prompts import writer_system_prompt, marketer_non_sub_system_prompt, marketer_sub_system_prompt
+from backend.prompts import writer_system_prompt, marketer_non_sub_system_prompt, marketer_sub_system_prompt, validator_system_prompt
 from backend.settings import settings
 from langgraph.prebuilt import create_react_agent
 from backend.db import get_pg_async_session
@@ -51,6 +51,27 @@ def generate_newsletter(state: AgentState) -> AgentState:
         state.newsletter_title = "Today's Newsletter"
         state.newsletter_content = result.content
     return state
+
+def fix_json(state: AgentState) -> AgentState:
+    if state.newsletter_title == "Today's Newsletter":
+        print("Fixing Json")
+        chat_openai = ChatOpenAI(
+            model=settings.OPENROUTER_MODEL, 
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+            temperature=0,
+        )
+        user_message = [SystemMessage(content=validator_system_prompt.format(news_content=state.newsletter_content)), HumanMessage(content="Fix the malformated Json and return in proper Json format.")]
+        result = chat_openai.invoke(user_message)
+        try:
+            result_json = json.loads(result.content)
+            state.newsletter_title = result_json["Title"]
+            state.newsletter_content = result_json["Content"]
+        except (json.JSONDecodeError, KeyError):
+            state.newsletter_title = "Today's Newsletter (Sorry for the broken newsletter body😣)"
+            state.newsletter_content = result.content
+    return state
+
 
 async def save_newsletter(state: AgentState) -> AgentState:
     """
@@ -179,6 +200,7 @@ builder = StateGraph(AgentState)
 builder.add_node("charge_subscription_fee", charge_subscription_fee)
 builder.add_node("generate_newsletter", generate_newsletter)
 builder.add_node("list_trending_news", list_trending_news)
+builder.add_node("fix_json", fix_json)
 builder.add_node("save_newsletter", save_newsletter)
 builder.add_node("generate_email_for_sub", generate_email_for_sub)
 builder.add_node("generate_email_for_non_sub", generate_email_for_non_sub)
@@ -186,7 +208,8 @@ builder.add_node("send_email_to_users", send_email_to_users)
 
 builder.add_edge(START, "list_trending_news")
 builder.add_edge("list_trending_news", "generate_newsletter")
-builder.add_edge("generate_newsletter", "save_newsletter")
+builder.add_edge("generate_newsletter", "fix_json")
+builder.add_edge("fix_json", "save_newsletter")
 builder.add_edge("save_newsletter", "generate_email_for_sub")
 builder.add_edge("generate_email_for_sub", "generate_email_for_non_sub")
 builder.add_edge("generate_email_for_non_sub", "send_email_to_users")
