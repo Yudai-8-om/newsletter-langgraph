@@ -30,6 +30,10 @@ Include:
 Today's newsletter:
 {newsletter}
 
+URL to the landing page (if you use): 
+- https://newsletter-langgraph.vercel.app/
+Don't use any other URL than this. 
+
 Output in JSON format:
     {{
       "Subject": "Your email subject here",
@@ -120,6 +124,10 @@ Include:
 
 Today's newsletter:
 {newsletter}
+
+URL to the landing page (if you use): 
+https://newsletter-langgraph.vercel.app/
+Don't use any other URL than this. 
 
 Output in JSON format. Inside body, use HTML. 
     {{

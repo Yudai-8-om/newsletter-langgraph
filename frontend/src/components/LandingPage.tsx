@@ -15,7 +15,7 @@ const LandingPage = () => {
             <div className="flex items-center p-4">
               <TrendingUp className="h-8 w-8 mr-2 text-blue-700" />
               <span className="lg:text-2xl text-xl font-bold text-gray-900">
-                BUZZ
+                Buzz
               </span>
             </div>
             <div className="flex space-x-4">
@@ -93,7 +93,7 @@ const LandingPage = () => {
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
-            <p>&copy; 2025 AI Newsletter. Stay informed, stay ahead.</p>
+            <p>&copy; 2025 Buzz Newsletter. Stay informed, stay ahead.</p>
           </div>
         </div>
       </footer>

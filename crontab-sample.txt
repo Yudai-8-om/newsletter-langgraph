@@ -1,1 +1,1 @@
-00 8 * * * cd /project_directory && /dir/poetry run python backend/scheduler.py >> /project_directory/cron-langgraph.log 2>&1
+00 8 * * * cd /project_directory && /dir/poetry run python -m backend.scheduler >> /project_directory/cron-langgraph.log 2>&1

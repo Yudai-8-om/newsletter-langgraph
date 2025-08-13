@@ -8,7 +8,7 @@ const NewsletterArticle = () => (
       </h2>
       <div className="flex items-center text-sm text-gray-500">
         <Calendar className="w-4 h-4 mr-1" />
-        Today's Edition
+        July 31st
       </div>
     </div>
 
