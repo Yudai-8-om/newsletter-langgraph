@@ -5,7 +5,7 @@ from backend.settings import settings
 from contextlib import asynccontextmanager
 
 if settings.DEPLOY_LOCATION == "remote":
-    engine = create_async_engine(settings.DATABASE_URL_SUPABASE, echo=True, pool_size=5, max_overflow=10)
+    engine = create_async_engine(settings.DATABASE_URL_SUPABASE, echo=True, pool_size=5, max_overflow=10, pool_pre_ping=True, pool_recycle=240)
 else:
     engine = create_async_engine(settings.DATABASE_URL_NO_DOCKER, echo=True, pool_size=5, max_overflow=10)
     
