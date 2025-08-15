@@ -40,7 +40,6 @@ def generate_newsletter(state: AgentState) -> AgentState:
         base_url="https://openrouter.ai/api/v1",
     )
     news_str = "\n".join(f"<trending_news> Title: {news['title']} \nContent: {news['content']}</trending_news>" for news in state.trending_news[:3])
-    print(f"passed news: {news_str}")
     user_message = [SystemMessage(content=writer_system_prompt.format(news=news_str)), HumanMessage(content="Using the given trending news, write a newsletter")]
     result = chat_openai.invoke(user_message)
     try:
@@ -53,8 +52,10 @@ def generate_newsletter(state: AgentState) -> AgentState:
     return state
 
 def fix_json(state: AgentState) -> AgentState:
+    """
+    Langgraph node that fixes json format if it's malformatted.
+    """
     if state.newsletter_title == "Today's Newsletter":
-        print("Fixing Json")
         chat_openai = ChatOpenAI(
             model=settings.OPENROUTER_MODEL, 
             api_key=settings.OPENROUTER_API_KEY,
@@ -159,7 +160,7 @@ async def send_email_to_users(state: AgentState) -> AgentState:
     return state
 
 
-#Unused node, generated just for tool calling
+# Unused node, generated just for tool calling
 def charge_subscription_fee(state: AgentState) -> AgentState:
     """
     Langgraph node that charges monthly subscription fee, $1/month

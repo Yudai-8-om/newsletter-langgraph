@@ -41,7 +41,7 @@ def fetch_news_api(country: str):
                     })
         return {"trending_news": output}
     else:
-        return {"error": f"Error fetching news: {response.status_code}"}
+        return {"trending_news": f"Error fetching news: {response.status_code}"}
         
 @traceable
 def get_text_content(url: str) -> str:
@@ -95,19 +95,6 @@ def create_stripe_subscription_session(customer_id: str):
         )
     return session
 
-def send_email(email: str, subject: str, html_content: str):
-    message = MIMEMultipart("alternative")
-    message["From"] = settings.EMAIL_ADDRESS
-    message["To"] = email
-    message["Subject"] = subject
-    html_part = MIMEText(html_content, "html")
-    message.attach(html_part)
-
-    with SMTP_SSL('smtp.gmail.com', 465) as server:
-        server.ehlo()
-        server.login(settings.EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
-        server.send_message(message)
-
 async def update_user_subscription(stripe_customer_id: str, subscription_id: str, subscription_status: str):
     """
     updates user subscritpion status upon webhook
@@ -121,3 +108,17 @@ async def update_user_subscription(stripe_customer_id: str, subscription_id: str
         target_user.is_subscribed = subscription_status == "active"
 
         await session.commit()
+
+def send_email(email: str, subject: str, html_content: str):
+    message = MIMEMultipart("alternative")
+    message["From"] = settings.EMAIL_ADDRESS
+    message["To"] = email
+    message["Subject"] = subject
+    html_part = MIMEText(html_content, "html")
+    message.attach(html_part)
+
+    with SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.ehlo()
+        server.login(settings.EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
+        server.send_message(message)
+

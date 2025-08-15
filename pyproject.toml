@@ -39,6 +39,7 @@ notebook = "^7.4.4"
 langgraph-cli = { extras = ["inmem"], version = "^0.3.6" }
 langgraph-api = "^0.2.110"
 pytest = "^8.4.1"
+pytest-asyncio = "^1.1.0"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

@@ -1,12 +1,16 @@
 # Buzz Newsletter
 
+## Goal
+
+- Build cost-effective news curation tool with LLM
+
 ## Tech Stack
 
 - **Frontend:** TypeScript, React, TailwindCSS
 - **Backend:** Python (FastAPI, LangGraph, SqlAlchemy etc.)
 - **Database:** PostgreSQL
 - **LLM:** Ollama | OpenRouter ([Link](https://openrouter.ai/))
-- **Deployment:** (Docker)
+- **Deployment:** Vercel, Render, Supabase
 
 ## Features
 
@@ -19,7 +23,7 @@
 ### 2. Billing
 
 - Redirect to Stripe session upon when the Upgrade button is hit
-- Update Postgres upon successful payment
+- Update Postgres User table upon successful payment
 
 ### 3. Marketing
 
@@ -35,14 +39,16 @@
 - LangGraph vs CrewAI: chose LangGraph for flexibility
 - Ollama vs OpenRouter: Initially I was using Ollama, but due to hardware limitation, I moved to OpenRouter.
   - Tested model
-  1.  Qwen3 8B (Ollama): because of high tool calling performance ([Link](https://www.docker.com/blog/local-llm-tool-calling-a-practical-evaluation/)). Very slow with my hardware.
-  2.  Gemma3n E4B (Ollama): good for edge device -> context size was not enough and increasing it caused crash.
+  1.  Qwen3 8B (Ollama): chosen because of high tool calling performance ([Link](https://www.docker.com/blog/local-llm-tool-calling-a-practical-evaluation/)). Very slow with my hardware.
+  2.  Gemma3n E4B (Ollama): good for edge device -> context size was not enough and increasing the size caused crash.
   3.  Gemma3 30B (OpenRouter): faster and better quality output (if data privacy is not important for your app)
 
-## Room for improvement | Bugs
+## Room for improvement
 
-- Data integrity: LangGraph node sometimes doesn't output json properly. Insert validation node.
+- Currently the agent curates only top 3 news: 10+ news can be used to add more colors to the newsletter.
 - Personalized newsletter generation: Newsletter can be generated for each customer based on their favorite topics.
+- Robust retry logic
+
 
 ## Topics learned
 
