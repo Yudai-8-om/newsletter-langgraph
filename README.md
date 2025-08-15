@@ -4,6 +4,12 @@
 
 - Build cost-effective news curation tool with LLM
 
+## What to expect
+By signing up for the newsletter:
+- Access newsletters from the past up to 7 days. 
+- Get daily email featuring today's trending news. 
+- Upgrade to the premium version. (Note that there is no difference in content visibility)
+
 ## Tech Stack
 
 - **Frontend:** TypeScript, React, TailwindCSS
